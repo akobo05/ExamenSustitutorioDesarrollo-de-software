@@ -1,0 +1,17 @@
+# 3. Respuestas
+
+### Estándar Extremo de IaC Limpia para Entorno Clínico
+Este estándar busca eliminar la confianza implicita y reemplazarla por verificación criptográfica y validación automática.
+
+Como se menciono anterior mente, todos los **commits deben de estar firmados**, ya que en un entorno clínico, es vital probar la autoría de cada línea de código. Se debe configurar el repositorio para rechazar cualquier push que contenga commits sin firmar o con firmas no verificadas. Esto impide la suplantación de identidad de un desarrollador para inyectar código malicioso que altere diagnósticos.
+
+Debe de haber **PRs con doble aprobacion**, esta practica es la que mi equipo implemento en cada examen calificado, que quiere decir que todo cambio a ramas protegidas (main, release/*) requiere la aprobación de al menos dos revisores: un par técnico y un oficial de seguridad o dueño del código (CODEOWNERS). Esto debido a que mitiga el riesgo de errores humanos críticos o ataques internos, como un erro de mi parte realice un PR directo a la rama main en vez de a la develop, por suerte mis compañeros de equipo me avisaron y me ayudaron a corregir el error.
+
+Tenemos despues las **politicas como codigo**, como regla tenemos que el pipeline CI/CD debe incluir "puertas" bloqueantes que fallen ante violaciones de política antes del despliegue. Para esto tenemos herramientas como el **pre-commit** que basicamente se trata de reglas que debe de cumplir ya sea el codigo o el mismo commit antes de enviarse, en nuestro caso pusimos un pre commit, que no nos dejaba mandar si estaba mal ya sea esticao por seguridad,tmb tenemos el **analisis estatico** para detectar configuraciones inseguras (puertos abiertos, cifrado faltante). tambien tenemos las **politicas de secreto rotable** cuya regla es prohibir el uso de credenciales estáticas de larga duración, se usan gestores centralizados para inyectar secretos en tiempo de ejcucion. para la **convención de variables con tipado y validación fuerte** aqui como regla tenemos que esta prohibido el uso de tipos genericos como any o string sin formato para parametros criticos.Asi que debemos definir tipos especificos, tambien debemos de usar bloques de validacion en terraform, adecional a eso cada variable debe de tener una descripcion clara de su inpacto.
+
+### Anti-patrones Silenciosos y su Impacto Clínico
+Estos son errores que "no rompen el build" (son silenciosos) pero degradan la postura de seguridad y legalidad con el tiempo.
+
+Aqui tenemos el mencionado anteriormente **Drift** que son cambios manuanles ad-hoc como dicen las lecturas, aqui un operador modifica manualmente la configuracion de un nodo clinico, hace cosas como cambiar permisos o parametros de red etc, esto lo hace para solucionar alguna urgencia, lo malo de esto es que es silencioso por que el sistema sigue funcionando, y el código en Git no muestra errores. Un grabe impacto seria, si ocurre una negligencia médica, la auditoría revisará el código Git, el cual no coincidirá con la realidad del nodo. La clínica no podrá demostrar bajo qué condiciones operaba el equipo de diagnóstico, perdiendo la trazabilidad forense.
+
+Otro antipatron seria los **privilegios IAM sobredimensionados**, esto podriamos decir que es tener  politicas permisivas por conveniencia, para que todo funcione al igual que el anterior este es silencioso es decir no muestra errores un posible inpacto clinico seria la exposicion masiva de  datos sensibles.
