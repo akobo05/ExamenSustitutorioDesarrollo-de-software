@@ -1,0 +1,16 @@
+# 1. Respuestas 
+En el contexto dado, la combinacion de la Iac y la seguridad de cadena de suministros no es una mejora operativa, es un requisito legal y etico de no repudio , este sistema emite diagnosticos que afectan las vidas humanas por lo tanto el software debe tener una trazabilidad tan rigurosa como la de una muestra de snagre en la vida real.
+
+**La reproducibilidad** en Iac garantiza que el entorno sea identico en cada despliegue eliminando el drift manual.
+**Por ejemplo como responsabilidad legal**, Si un paciente reclama un mal diagnóstico ocurrido hace 6 meses, IaC permite reconstruir el entorno exacto de ese día para auditar si el fallo fue del modelo ML o de una configuración de infraestructura ej. latencia alta por mala configuración de red. Sin IaC, esa reconstrucción es imposible es palabra contra palabra.
+
+**El SBOM** viene a ser un inventario detallado de todos los componentes y dependencias que forman parte de una aplicacion.
+**Como ejemplo de responsabilidad**  Permite la farmacovigilancia digital. Si se descubre una vulnerabilidad crítica en una librería de procesamiento de señales ej. numpy con un bug matemático, el SBOM permite identificar instantáneamente qué pacientes fueron diagnosticados usando esa versión corrupta y notificarles.
+
+ **Firmas y Procedencia (Provenance)**: Las firmas digitales ej. GPG, Cosign aseguran la autenticidad, garantizando que el modelo de IA o el contenedor desplegado es exactamente el que el equipo de ingeniería certificó y no una versión manipulada por un atacante en la red interna insegura. La procedencia (SLSA) documenta "quién, cuándo y cómo" se construyó el artefacto, proporcionando una cadena de custodia digital inmutable.
+
+ **El impacto legal** seria el establecimiento del no repudio, un operador o atacante no puede alterar el software de diagnóstico sin romper la firma, lo que exime de responsabilidad al proveedor del software si la integridad se valida correctamente.
+
+ **Pasaremos a un escenario ficticio, pero muy realista**: Un paciente demanda a la clínica rural y al proveedor del sistema "Salud Crítica" tras un falso negativo en una detección de cáncer que retrasó su tratamiento 6 meses. La acusación alega que el software utilizado el día 15 de octubre estaba desactualizado o corrupto debido a un fallo en la red local.
+
+ Primero extraen el registro de procedencia (SLSA) del contenedor que se ejecutó ese día, demostrando que fue construido por el pipeline oficial IC-Pipeline-Alpha y no por una compilación manual en sitio. Despues motrarian la firma criptográfica del contenedor coincide con la clave pública de la entidad certificadora de salud, probando que el binario no fue alterado por malware en la red local (Zero Trust). Depues mostrarian el SBOM de esa versión exacta, demostrando que la librería de inferencia ML utilizada era la versión certificada por la autoridad sanitaria y no contenía vulnerabilidades conocidas en esa fecha, y finalmente muestran la reproductibilidad  utilizando el commit de IaC registrado en la procedencia para desplegar un entorno idéntico en el juzgado e ingresan los datos brutos (anonimizados) del paciente, obteniendo el mismo resultado. Esto demuestra que el diagnóstico fue una limitación técnica conocida del modelo (margen de error estadístico) y no una negligencia operativa o manipulación del sistema.
